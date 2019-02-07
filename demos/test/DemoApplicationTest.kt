@@ -3,10 +3,14 @@ import javafx.stage.Stage
 import java.util.concurrent.CountDownLatch
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class DemoApplicationTest {
     init {
+        // java version: 1.8.0_172
+        println("java version: ${System.getProperty("java.version")}")
+
         val barrier = CountDownLatch(1)
         PlatformImpl.startup { barrier.countDown() }
         barrier.await()
@@ -18,30 +22,33 @@ class DemoApplicationTest {
     }
 
     @Test
-    fun `call start and stop methods` () {
+    fun `call start method` () {
         // given:
-        val stage = Stage()
         val application = DemoApplication()
 
         // when:
-        application.start(stage)
-        application.stop()
+        PlatformImpl.runAndWait {
+            val stage = Stage()
+            application.start(stage)
+        }
 
         // then:
-        assertEquals(4, 2 + 2)
+        assertNotNull(application.stage)
     }
 
     @Test
-    fun `call start and stop methods again` () {
+    fun `call start and stop methods` () {
         // given:
-        val stage = Stage()
         val application = DemoApplication()
 
         // when:
-        application.start(stage)
-        application.stop()
+        PlatformImpl.runAndWait {
+            val stage = Stage()
+            application.start(stage)
+            application.stop()
+        }
 
         // then:
-        assertEquals(4, 2 + 2)
+        assertNull(application.stage)
     }
 }

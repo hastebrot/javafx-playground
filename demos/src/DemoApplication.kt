@@ -8,8 +8,15 @@ fun main() {
 }
 
 class DemoApplication : Application() {
+    var stage: Stage? = null
+
     override fun start(stage: Stage) {
+        this.stage = stage
         stage.scene = Scene(Label("demo application"))
         stage.show()
+    }
+
+    override fun stop() {
+        stage = null
     }
 }

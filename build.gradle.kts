@@ -7,6 +7,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val gradleWrapperVersion by extra { "5.2" }
 val kotlinVersion by extra { "1.3.21" }
 val kotlinTestVersion by extra { "3.2.1" }
+val junitJupiterVersion by extra { "5.3.2" }
 
 plugins {
     val kotlinVersion = "1.3.21"
@@ -25,13 +26,18 @@ dependencies {
     compile(kotlin("reflect", kotlinVersion))
     compile(kotlin("stdlib-jdk7", kotlinVersion))
     compile(kotlin("stdlib-jdk8", kotlinVersion))
+
+    compile("org.slf4j:slf4j-api:1.7.25")
+    compile("org.slf4j:slf4j-simple:1.7.25")
 }
 
 dependencies {
     testCompile(kotlin("test", kotlinVersion))
     testCompile(kotlin("test-junit5", kotlinVersion))
 
-    testCompile("io.kotlintest:kotlintest-runner-junit5:$kotlinTestVersion")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
+//    testCompile("io.kotlintest:kotlintest-runner-junit5:$kotlinTestVersion")
 }
 
 sourceSets {
@@ -70,6 +76,14 @@ tasks {
     withType<DokkaTask> {
         outputFormat = "javadoc"
         outputDirectory = "$buildDir/javadoc"
+    }
+
+    withType<Test> {
+        useJUnitPlatform()
+
+        testLogging {
+            events("PASSED", "FAILED", "SKIPPED", "STANDARD_OUT", "STANDARD_ERROR")
+        }
     }
 }
 
